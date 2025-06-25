@@ -1,7 +1,8 @@
 venv/
-
 .vscode/
-
+__pycache__/*
 env/
 m37labs-PI1/
 train_data/
+__pycache__
+.env

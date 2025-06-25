@@ -26,7 +26,7 @@ def extract_squad_samples(data: Dict) -> List[Dict[str, str]]:
                
                 # Format in the specified prompt template
                 formatted_text = {
-                    "text": f"### system: {context}\n\n### user: {question}\n\n### assistant: {answer}"
+                        "text": f"### context: {context}\n\n### user: {question}\n\n### assistant: {answer}"
                 }
                 samples.append(formatted_text)
     return samples

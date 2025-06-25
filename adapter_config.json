@@ -1,0 +1,8 @@
+{
+  "base_model_name_or_path": "mlx-community/TinyLlama-1.1B-Chat-v1.0-4bit",
+  "peft_type": "LORA",
+  "r": 64,
+  "lora_alpha": 16,
+  "lora_dropout": 0.1,
+  "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"]
+}

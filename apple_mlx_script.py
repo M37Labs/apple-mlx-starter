@@ -87,14 +87,17 @@ def save_samples_as_jsonl(samples: List[Dict[str, str]], output_dir: str, filena
 
 
 def main():
+    # Set seed for reproducibility
     random.seed(42)
-
+    # Create output and training data is already handled within save_samples_as_jsonl @lead_dev
+    # Print welcome message
     divider('=')
     info("Welcome to the SQuAD → MLX-LM Data Preparation Script!")
     print(Fore.WHITE + "Prepares your data for model fine-tuning, even if you're not a machine learning guru.")
     divider()
-
+    # Download SQuAD data
     info("Step 1: Downloading SQuAD data...")
+    # Use try-except to handle errors
     try:
         squad_data = download_squad_data()
         success("✓ SQuAD data downloaded successfully.")
@@ -103,13 +106,13 @@ def main():
         error(str(e))
         exit(1)
     divider()
-
+    # Extract Q&A samples and format prompts
     info("Step 2: Extracting Q&A samples and formatting prompts...")
     samples = extract_squad_samples(squad_data)
     success(f"✓ Extracted {len(samples):,} formatted samples.")
     print("   Each prompt is structured for MLX-LM training, containing context, question, and answer.")
     divider()
-
+    # Split data into training/validation/test sets
     info("Step 3: Splitting into training/validation/test sets...")
     train_samples, val_samples, test_samples = split_data(samples, VALIDATION_SPLIT, TEST_SPLIT)
     print(f"    {Fore.GREEN}Training: {len(train_samples):,} samples")
@@ -118,7 +121,7 @@ def main():
     print(f"{Fore.CYAN}Note: Validation and test sets help evaluate your model honestly. "
           "We're not letting it cheat by seeing all the answers first!")
     divider()
-
+    # Save datasets as JSONL
     info("Step 4: Saving datasets as JSONL...")
     save_samples_as_jsonl(train_samples, TRAIN_DATA_DIR, "train.jsonl")
     save_samples_as_jsonl(val_samples, TRAIN_DATA_DIR, "valid.jsonl")
@@ -127,12 +130,11 @@ def main():
     success("All datasets saved! 🚀")
     divider('=')
 
+    # Print training instructions
 bright = Style.BRIGHT
 reset = Style.RESET_ALL
 
-
-print(f"{Fore.GREEN}{bright}🎉 Data preparation complete!{reset}\n")
-print(f"{Fore.YELLOW}{bright}To start training with LoRA and 4-bit quantization, follow these steps:{reset}\n")
+print(f"{Fore.YELLOW}{bright}🎉To start training with LoRA and 4-bit quantization, follow these steps:{reset}\n")
 
 
 divider()
@@ -186,7 +188,7 @@ print(f"{Fore.GREEN}{bright}You're all set to train and test your model like a p
 divider('═')
 
 
-
+# Main function
 if __name__ == "__main__":
     main()
 

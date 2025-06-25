@@ -72,7 +72,7 @@ apple-mlx/
 python main.py
 ```
 
-### Option 2: Use the backward compatibility wrapper
+### Option 2: Use the backward compatibility wrapper [DEPRECATED]
 ```bash
 python apple_mlx_script.py
 ```

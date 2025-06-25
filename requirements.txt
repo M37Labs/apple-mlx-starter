@@ -1,0 +1,7 @@
+datasets
+mlx_lm
+transformers
+mlx
+pandas
+numpy
+tqdm

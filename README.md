@@ -1,6 +1,6 @@
-# MLX Fine-tuning with SQuAD Dataset
+# MLX Fine-tuning
 
-This repository contains code for fine-tuning a Mistral-7B model using Apple's MLX framework with the SQuAD dataset.
+This repository contains code for fine-tuning a Mistral-7B model using Apple's MLX framework with the given dataset.
 
 ## Requirements
 

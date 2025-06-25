@@ -1,3 +1,7 @@
 venv/
 
 .vscode/
+
+env/
+m37labs-PI1/
+train_data/

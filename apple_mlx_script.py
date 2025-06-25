@@ -9,16 +9,27 @@ import requests
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
+from colorama import init, Fore, Style
+
+init(autoreset=True)
+
+def info(msg): print(Fore.CYAN + msg)
+def success(msg): print(Fore.GREEN + msg)
+def warn(msg): print(Fore.YELLOW + msg)
+def error(msg): print(Fore.RED + msg)
+def bold(msg): print(Style.BRIGHT + msg)
+def divider(char='-', length=60): print(Fore.MAGENTA + char * length)
+
 
 # Constants
 SQUAD_URL = "https://raw.githubusercontent.com/rajpurkar/SQuAD-explorer/master/dataset/train-v1.1.json"
 MODEL_NAME = "mlx-community/Mistral-7B-Instruct-v0.2-4bit"
-MLX_QUANTIZE_MODEL = 'phi2_quantized'
+MLX_QUANTIZE_MODEL = 'mlx-community/Mistral-7B-Instruct-v0.2-4bit' # keep emtpy when quantizing new non 4bit model
 OUTPUT_DIR = "m37labs-PI1"
 TRAIN_DATA_DIR = "train_data"
 VALIDATION_SPLIT = 0.1  # 10% for validation
 TEST_SPLIT = 0.1  # 10% for testing
-# HF_MODEL = "<add_hf_model_repo>"
+# HF_MODEL = "<add_hf_model_repo>" # keep emtpy when quantizing new non 4bit model
 
 def download_squad_data() -> Dict:
     """Download SQuAD v1.1 training data."""
@@ -76,63 +87,104 @@ def save_samples_as_jsonl(samples: List[Dict[str, str]], output_dir: str, filena
 
 
 def main():
-    # Set random seed for reproducibility
     random.seed(42)
-   
-    # Create output directories
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    os.makedirs(TRAIN_DATA_DIR, exist_ok=True)
-   
-    # Download and process SQuAD data
-    print("Downloading SQuAD data...")
-    squad_data = download_squad_data()
-   
-    print("Extracting samples...")
+
+    divider('=')
+    info("Welcome to the SQuAD → MLX-LM Data Preparation Script!")
+    print(Fore.WHITE + "Prepares your data for model fine-tuning, even if you're not a machine learning guru.")
+    divider()
+
+    info("Step 1: Downloading SQuAD data...")
+    try:
+        squad_data = download_squad_data()
+        success("✓ SQuAD data downloaded successfully.")
+    except Exception as e:
+        error("Failed to download SQuAD data!")
+        error(str(e))
+        exit(1)
+    divider()
+
+    info("Step 2: Extracting Q&A samples and formatting prompts...")
     samples = extract_squad_samples(squad_data)
-    print(f"Extracted {len(samples)} samples")
-   
-    # Split into training, validation, and test sets
-    print("\nSplitting data into training, validation, and test sets...")
+    success(f"✓ Extracted {len(samples):,} formatted samples.")
+    print("   Each prompt is structured for MLX-LM training, containing context, question, and answer.")
+    divider()
+
+    info("Step 3: Splitting into training/validation/test sets...")
     train_samples, val_samples, test_samples = split_data(samples, VALIDATION_SPLIT, TEST_SPLIT)
-    print(f"Training samples: {len(train_samples)}")
-    print(f"Validation samples: {len(val_samples)}")
-    print(f"Test samples: {len(test_samples)}")
-   
-    # Save samples in JSONL format for MLX-LM
+    print(f"    {Fore.GREEN}Training: {len(train_samples):,} samples")
+    print(f"    {Fore.YELLOW}Validation: {len(val_samples):,} samples")
+    print(f"    {Fore.CYAN}Test: {len(test_samples):,} samples")
+    print(f"{Fore.CYAN}Note: Validation and test sets help evaluate your model honestly. "
+          "We're not letting it cheat by seeing all the answers first!")
+    divider()
+
+    info("Step 4: Saving datasets as JSONL...")
     save_samples_as_jsonl(train_samples, TRAIN_DATA_DIR, "train.jsonl")
-    save_samples_as_jsonl(val_samples, TRAIN_DATA_DIR, "valid.jsonl")  # Changed to valid.jsonl as expected by MLX-LM
+    save_samples_as_jsonl(val_samples, TRAIN_DATA_DIR, "valid.jsonl")
     save_samples_as_jsonl(test_samples, TRAIN_DATA_DIR, "test.jsonl")
-   
-    print("\nData preparation complete!")
-    print("\nTo start training with LoRA and 4-bit quantization, run the following commands:")
-    print("\n1. First, convert and quantize the model:")
-    print(f"""python3 -m mlx_lm convert \\
-        --hf-path {MODEL_NAME} \\
-        --mlx-path {MLX_QUANTIZE_MODEL} \\
-        -q""")                              # Comment this line when you want to Upload in HF
-        # -q                                # Uncomment this line when you want to Upload in HF
-        # --upload-repo {HF_MODEL}""")      # Uncomment this line when you want to Upload in HF
-   
-    print("\n2. Then, run the training:")
-    print(f"""python3 -m mlx_lm lora \\
-    --model {MLX_QUANTIZE_MODEL} \\
-    --train \\
-    --data {TRAIN_DATA_DIR} \\
-    --num-layers 8 \\
-    --batch-size 2 \\
-    --iters 100 \\
-    --learning-rate 5e-5 \\
-    --steps-per-report 10 \\
-    --adapter-path {OUTPUT_DIR} \\
-    --fine-tune-type lora""")
-   
-    print("\n3. To test the model after training:")
-    print(f"""python3 -m mlx_lm lora \\
-    --model {MLX_QUANTIZE_MODEL} \\
-    --adapter-path {OUTPUT_DIR} \\
-    --test \\
-    --data {TRAIN_DATA_DIR} \\
-    --test-batches 5""")
+    divider('=')
+    success("All datasets saved! 🚀")
+    divider('=')
+
+bright = Style.BRIGHT
+reset = Style.RESET_ALL
+
+
+print(f"{Fore.GREEN}{bright}🎉 Data preparation complete!{reset}\n")
+print(f"{Fore.YELLOW}{bright}To start training with LoRA and 4-bit quantization, follow these steps:{reset}\n")
+
+
+divider()
+print(f"{Fore.YELLOW}⚡ {bright}Notes:{reset}")
+print(f"  {Fore.YELLOW}• Skip step 1a if you already have the quantized model")
+print(f"  • Skip step 1b if you're using an existing MLX quantized model{reset}")
+print(f"  • Ensure model selected is `apple-mlx` compatible{reset}")
+print(f"  • Re-quantizing an already 4bit model -> 4bit will throw error and waste resource{reset}")
+
+divider('─')
+print(f"{Fore.CYAN}{bright}Step 1: Model preparation{reset}")
+print(f"   {Fore.WHITE}a) If you already have a 4-bit quantized MLX model:{reset}")
+print(f"      {Fore.YELLOW}Simply ensure it's located at: {Fore.GREEN}MLX_QUANTIZE_MODEL{reset}")
+print()
+print(f"   {Fore.WHITE}b) If you need to convert/quantize a Hugging Face model:{reset}")
+print(f"""      {Fore.CYAN}python3 -m mlx_lm convert \\
+        --hf-path {Fore.GREEN}{MODEL_NAME}{reset} \\
+        --mlx-path {Fore.GREEN}MLX_QUANTIZE_MODEL{reset} \\
+        -q{reset}
+""")
+
+divider('─')
+print(f"{Fore.CYAN}{bright}Step 2: Training{reset}")
+print(f"""      {Fore.CYAN}python3 -m mlx_lm lora \\
+        --model {Fore.GREEN}{bright}{MLX_QUANTIZE_MODEL}{reset} \\
+        --train \\
+        --data {Fore.GREEN}{bright}{TRAIN_DATA_DIR}{reset} \\
+        --num-layers 8 \\
+        --batch-size 2 \\
+        --iters 100 \\
+        --learning-rate 5e-5 \\
+        --steps-per-report 10 \\
+        --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset} \\
+        --fine-tune-type lora{reset}
+""")
+
+divider('─')
+print(f"{Fore.CYAN}{bright}Step 3: Testing your fine-tuned model{reset}")
+print(f"""      {Fore.CYAN}python3 -m mlx_lm lora \\
+        --model {Fore.GREEN}{bright}{MLX_QUANTIZE_MODEL}{reset} \\
+        --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset} \\
+        --test \\
+        --data {Fore.GREEN}{bright}{TRAIN_DATA_DIR}{reset} \\
+        --test-batches 5{reset}
+""")
+
+
+
+divider('═')
+print(f"{Fore.GREEN}{bright}You're all set to train and test your model like a pro! 🚀{reset}")
+divider('═')
+
 
 
 if __name__ == "__main__":

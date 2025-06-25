@@ -1,33 +1,71 @@
-# Phi-2 Fine-tuning with MLX and LoRA
+# MLX Fine-tuning with SQuAD Dataset
 
-This project fine-tunes the Phi-2 model on the SQuAD v1.1 dataset using MLX and LoRA with 4-bit quantization.
+This repository contains code for fine-tuning a Mistral-7B model using Apple's MLX framework with the SQuAD dataset.
+
+## Requirements
+
+- macOS (Apple Silicon Mac recommended)
+- Python 3.9+
+- Git
 
 ## Setup
 
-1. Install required packages:
+### 1. Clone the Repository
+
 ```bash
-pip install mlx-lm transformers requests numpy tqdm
+git clone https://github.com/yourusername/mlx_apple.git
+cd mlx_apple
 ```
 
-## Training Process
+### 2. Create and Activate a Virtual Environment
 
-1. **Prepare Data**:
 ```bash
-python cursor_apple_mlx.py
+python -m venv venv
+source venv/bin/activate
 ```
-This will:
-- Download SQuAD v1.1 dataset
-- Create training (70,081 samples), validation (8,759 samples), and test (8,759 samples) sets
-- Save them in JSONL format in the `train_data` directory
 
-2. **Convert and Quantize Model**:
+### 3. Install Dependencies
+
 ```bash
-python -m mlx_lm convert --hf-path microsoft/phi-2 --mlx-path phi2_quantized -q
+pip install mlx mlx-lm transformers numpy requests tqdm
 ```
-This creates a 4-bit quantized version of Phi-2 (average 4.504 bits per weight)
 
-3. **Train with LoRA**:
+## Usage
+
+### 1. Prepare the Dataset
+
+Run the data preparation script to download and format the SQuAD dataset:
+
 ```bash
+python apple_mlx_script.py
+```
+
+This script will:
+- Download SQuAD v1.1 training data
+- Format it for fine-tuning
+- Split it into training, validation, and test sets
+- Save the data in the required format
+- **Output the exact commands to run for the next steps**
+
+### 2-4. Follow the Generated Commands
+
+After running the script, it will output specific commands for:
+1. Converting and quantizing the model
+2. Running the training with LoRA
+3. Testing the fine-tuned model
+
+**Important:** The exact commands are generated dynamically based on the variables defined in the script (like `MODEL_NAME`, `MLX_QUANTIZE_MODEL`, `OUTPUT_DIR`, etc.). Always use the commands provided by the script output rather than copying from this README.
+
+Example of what the generated commands might look like:
+
+```bash
+# 1. Convert and quantize the model:
+python -m mlx_lm convert \
+    --hf-path mlx-community/Mistral-7B-Instruct-v0.2-4bit \
+    --mlx-path phi2_quantized \
+    -q
+
+# 2. Run the training:
 python -m mlx_lm lora \
     --model phi2_quantized \
     --train \
@@ -37,60 +75,34 @@ python -m mlx_lm lora \
     --iters 100 \
     --learning-rate 5e-5 \
     --steps-per-report 10 \
-    --adapter-path mlx_phi2_finetuned \
+    --adapter-path m37labs-PI1 \
     --fine-tune-type lora
+
+# 3. Test the model:
+python -m mlx_lm lora \
+    --model phi2_quantized \
+    --adapter-path m37labs-PI1 \
+    --test \
+    --data train_data \
+    --test-batches 5
 ```
 
-Training metrics:
-- Only 0.024% parameters trainable (655K out of 2.78B)
-- Validation loss improved from 2.723 to 2.228
-- Peak memory usage: 3.661 GB
-- Training speed: 81-234 tokens/sec
+## Project Structure
 
-## Model Files
+- `apple_mlx_script.py`: Main script for data preparation
+- `train_data/`: Directory containing formatted training data
+- `m37labs-PI1/`: Output directory for the fine-tuned model
+- `phi2_quantized/`: Directory for the quantized model
 
-The trained model consists of two parts:
-1. Base quantized model: `phi2_quantized/`
-2. LoRA adapter weights: `mlx_phi2_finetuned/adapters.safetensors`
+## Notes
 
-## Known Issues
+- This project uses 4-bit quantization to reduce memory usage
+- LoRA (Low-Rank Adaptation) is used for efficient fine-tuning
+- The model is fine-tuned on the SQuAD question-answering dataset
+- You can modify the variables at the top of `apple_mlx_script.py` to customize model names, output directories, etc.
 
-1. The current version of MLX has some limitations with the Metal backend for text generation. We're working on finding alternative ways to demonstrate the model's capabilities.
+## Optional: Uploading to Hugging Face
 
-2. For testing the model, you can use either:
-   ```bash
-   # Option 1: Test on validation set
-   python -m mlx_lm lora \
-       --model phi2_quantized \
-       --resume-adapter-file mlx_phi2_finetuned/adapters.safetensors \
-       --test \
-       --data train_data \
-       --test-batches 5
-
-   # Option 2: Interactive generation (may have Metal backend issues)
-   python -m mlx_lm generate \
-       --model phi2_quantized \
-       --adapter-path mlx_phi2_finetuned \
-       --prompt "### Question: What is...?\n\n### Context: ...\n\n### Answer:" \
-       --max-tokens 50
-   ```
-
-## Training Results
-
-The model shows improvement in performance:
-- Training loss decreased from 2.488 to 2.330
-- Validation loss improved from 2.723 to 2.228
-- The model was trained for 100 iterations
-- Used 4-bit quantization to reduce memory usage while maintaining performance
-
-## Directory Structure
-```
-.
-├── cursor_apple_mlx.py      # Main training script
-├── train_data/             # Training data directory
-│   ├── train.jsonl         # Training samples
-│   └── validation.jsonl    # Validation samples
-├── phi2_quantized/         # Quantized model directory
-└── mlx_phi2_finetuned/     # Fine-tuned model outputs
-    └── adapters.safetensors # Trained adapter weights
-``` 
+To upload your model to Hugging Face, edit the `apple_mlx_script.py` file:
+1. Uncomment the relevant lines in the script 
+2. Add your HF model repository name to the `HF_MODEL` variable

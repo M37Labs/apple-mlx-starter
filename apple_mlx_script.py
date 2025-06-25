@@ -27,6 +27,7 @@ def download_squad_data() -> Dict:
     return response.json()
 
 
+# This function will be change based on the data you want to use
 def extract_squad_samples(data: Dict) -> List[Dict[str, str]]:
     """Extract and format SQuAD samples into prompt format."""
     samples = []

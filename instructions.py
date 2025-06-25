@@ -37,7 +37,6 @@ def print_training_instructions():
         --learning-rate 5e-5 \\
         --steps-per-report 10 \\
         --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset} \\
-        --fine-tune-type lora{reset}
 """)
 
     divider('─')

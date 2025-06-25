@@ -13,8 +13,8 @@ This repository contains code for fine-tuning a Mistral-7B model using Apple's M
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mlx_apple.git
-cd mlx_apple
+git clone https://github.com/M37Labs/apple-mlx.git
+cd apple-mlx
 ```
 
 ### 2. Create and Activate a Virtual Environment
@@ -41,6 +41,7 @@ python apple_mlx_script.py
 ```
 
 This script will:
+
 - Download SQuAD v1.1 training data
 - Format it for fine-tuning
 - Split it into training, validation, and test sets
@@ -50,6 +51,7 @@ This script will:
 ### 2-4. Follow the Generated Commands
 
 After running the script, it will output specific commands for:
+
 1. Converting and quantizing the model
 2. Running the training with LoRA
 3. Testing the fine-tuned model
@@ -104,5 +106,6 @@ python -m mlx_lm lora \
 ## Optional: Uploading to Hugging Face
 
 To upload your model to Hugging Face, edit the `apple_mlx_script.py` file:
-1. Uncomment the relevant lines in the script 
+
+1. Uncomment the relevant lines in the script
 2. Add your HF model repository name to the `HF_MODEL` variable

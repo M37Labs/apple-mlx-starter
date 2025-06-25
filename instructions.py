@@ -8,17 +8,17 @@ def print_training_instructions():
 
     divider()
     print(f"{Fore.YELLOW}⚡ {bright}Notes:{reset}")
-    print(f"  {Fore.YELLOW}• Skip step 1a if you already have the quantized model")
+    print(f"  {Fore.YELLOW}• Skip step 1a if you already have the quantized model set MLX_QUANTIZE_MODEL in `config.py` ")
     print(f"  • Skip step 1b if you're using an existing MLX quantized model{reset}")
     print(f"  • Ensure model selected is `apple-mlx` compatible{reset}")
     print(f"  • Re-quantizing an already 4bit model -> 4bit will throw error and waste resource{reset}")
 
     divider('─')
     print(f"{Fore.CYAN}{bright}Step 1: Model preparation{reset}")
-    print(f"   {Fore.WHITE}a) If you already have a 4-bit quantized MLX model:{reset}")
-    print(f"      {Fore.YELLOW}Simply ensure it's located at: {Fore.GREEN}{MLX_QUANTIZE_MODEL}{reset}")
+    print(f"   {Fore.WHITE}a) If you wish to try another 4-bit quantized MLX model:{reset} [must try]")
+    print(f"      {Fore.YELLOW}Simply ensure it's HF-URL replaces current model: {Fore.GREEN}MLX_QUANTIZE_MODEL : '{MLX_QUANTIZE_MODEL}'{reset} in `config.py`")
     print()
-    print(f"   {Fore.WHITE}b) If you need to convert/quantize a Hugging Face model:{reset}")
+    print(f"   {Fore.WHITE}b) If you need to convert/quantize a Hugging Face model:{reset} repalce `--hf-path` with your model URL and `--mlx-path` with the desired model URL")
     print(f"""      {Fore.CYAN}python3 -m mlx_lm convert \\
         --hf-path {Fore.GREEN}{MODEL_NAME}{reset} \\
         --mlx-path {Fore.GREEN}{MLX_QUANTIZE_MODEL}{reset} \\

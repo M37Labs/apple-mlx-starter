@@ -36,7 +36,7 @@ def print_training_instructions():
         --iters 100 \\
         --learning-rate 5e-5 \\
         --steps-per-report 10 \\
-        --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset} \\
+        --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset}
 """)
 
     divider('─')
@@ -47,6 +47,15 @@ def print_training_instructions():
         --test \\
         --data {Fore.GREEN}{bright}{TRAIN_DATA_DIR}{reset} \\
         --test-batches 5{reset}
+""")
+
+    divider('─')
+    print(f"{Fore.CYAN}{bright}Step 4: Run inference on your fine-tuned model{reset}")
+    print(f"""      {Fore.CYAN}python3 -m mlx_lm generate \\
+        --model {Fore.GREEN}{bright}{MLX_QUANTIZE_MODEL}{reset} \\
+        --adapter-path {Fore.GREEN}{bright}{OUTPUT_DIR}{reset} \\
+        --prompt "Tell me a bit about India?" \\
+        --max-tokens 500{reset}
 """)
 
     divider('═')

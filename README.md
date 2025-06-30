@@ -2,6 +2,52 @@
 
 This project has been reorganized into a modular structure for better maintainability and readability.
 
+
+# Project Overview 
+
+> This project is a simple script that downloads a dataset, loads a model, and trains it on the dataset using the Apple MLX Python API. It is designed to be a starting point for your own projects.
+
+> It enables fine-tuning a model on a dataset and evaluating its performance. Using LoRA or QLoRA automatically for 4bit quantized models. 
+
+> It enables conversion of large language models to smaller models for faster inference using built-in quantization script i.e. part of the Apple MLX Python package.
+
+## Usage
+
+### Use `main.py` as entry point
+
+```bash
+git clone https://github.com/M37Labs/apple-mlx-starter.git
+```
+
+```bash
+python3 -m venv venv
+```
+
+```bash
+source venv/bin/activate
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+python main.py
+```
+
+### Follow the instructions in terminal output to train a model and run inference. Example output (DO NOT COPY THIS):
+
+![example output](<Screenshot 2025-06-26 at 19.49.10.png>)
+
+### Tinker with `config.py` to try new models and databases
+
+## Migration Notes
+
+- All existing functionality is preserved
+- The original `apple_mlx_script.py` is now deprecated
+- No breaking changes to the user interface
+- All imports and dependencies remain the same 
+
 ## File Structure
 
 ```
@@ -51,11 +97,6 @@ apple-mlx/
 - **Contains**: Formatted command generation for model preparation, training, and testing
 - **Benefits**: Clean separation of instruction logic
 
-### `apple_mlx_script.py`
-- **Purpose**: Backward compatibility wrapper
-- **Function**: Maintains compatibility with existing scripts
-- **Usage**: Can still run with `python apple_mlx_script.py`
-
 ## Benefits of This Structure
 
 1. **Modularity**: Each file has a single responsibility
@@ -65,28 +106,3 @@ apple-mlx/
 5. **Testing**: Easier to write unit tests for individual components
 6. **Backward Compatibility**: Existing scripts continue to work
 
-## Usage
-
-### Option 1: Use the new main entry point
-```bash
-python main.py
-```
-
-### Option 2: Use the backward compatibility wrapper [DEPRECATED]
-```bash
-python apple_mlx_script.py
-```
-
-### Option 3: Import specific modules
-```python
-from data_processor import process_data
-from config import MODEL_NAME
-from utils import info, success
-```
-
-## Migration Notes
-
-- All existing functionality is preserved
-- The original `apple_mlx_script.py` now acts as a simple wrapper
-- No breaking changes to the user interface
-- All imports and dependencies remain the same 
